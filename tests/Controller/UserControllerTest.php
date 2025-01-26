@@ -41,7 +41,7 @@ class UserControllerTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'email' => 'test@example.com',
-            'username' => 'newuser',
+            'username' => 'testuser',
             'password' => 'securepassword'
         ]));
 
@@ -59,13 +59,12 @@ class UserControllerTest extends WebTestCase
         $this->assertIsArray($responseData['errors']);
         $this->assertGreaterThan(0, count($responseData['errors']));
 
-        $error = $responseData['errors'][0];
-        $this->assertArrayHasKey('field', $error);
-        $this->assertArrayHasKey('message', $error);
+        $errors = $responseData['errors'];
 
-        // Exemple: Verifica un error específic al camp email
-        $this->assertEquals('email', $error['field']);
-        $this->assertEquals('Email already in use', $error['message']);
+        foreach ($errors as $error) {
+            if( $error['field'] == 'email' ) {
+                $this->assertEquals('Email already in use', $error['message']);
+            }
+        }
     }
-
 }

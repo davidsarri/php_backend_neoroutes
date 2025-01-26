@@ -49,9 +49,6 @@ class UserController
         if (count($errors) == 0) {
             $user->setCreatedAt(new \DateTime('now'));
 
-            // Xifrar contrasenya
-
-
             // Desa l'usuari
             $this->entityManager->persist($user);
             $this->entityManager->flush();
