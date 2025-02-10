@@ -1,24 +1,60 @@
+# Symfony 6 specific files
+/.idea/
+/.vscode/
 
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
+# Symfony directories
 /var/
 /vendor/
-###< symfony/framework-bundle ###
+/node_modules/
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
+# Composer files
+composer.lock
+composer.phar
 
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
+# Symfony logs and cache
+/var/cache/
+/var/log/
+/var/sessions/
 
-###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
-###< lexik/jwt-authentication-bundle ###
+# .env files (conté configuració sensible, com contrasenyes de bases de dades)
+.env
+.env.local
+.env.*.local
+
+# Files de configuració específics per a l'entorn
+/.env.test.local
+/.env.dev.local
+
+# Fitxers de dependències específics d'OS o IDEs
+.DS_Store
+Thumbs.db
+
+# Fitxers generats per la compilació i build
+/public/bundles/
+/public/build/
+/build/
+/var/run/
+/var/backups/
+
+# Fitxers de migracions de bases de dades, si utilitzes Doctrine
+# Aquests fitxers es poden regenerar, així que no haurien de ser pujats al repositori
+/migrations/*.php
+
+# Fitxers de configuració per IDEs
+/.idea
+/.vscode
+
+# Fitxers de dependències de front-end
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Fitxers específics de Docker si utilitzes Docker (optional)
+.docker-compose.override.yml
+.docker
+
+# Keys i fitxers de configuració de Firebase o serveis externs
+*.key
+*.pem
+*.crt
+*.p12

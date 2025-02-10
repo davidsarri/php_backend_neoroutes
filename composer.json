@@ -13,6 +13,7 @@
         "doctrine/orm": "^2.20",
         "firebase/php-jwt": "^6.11",
         "guzzlehttp/guzzle": "^7.9",
+        "lcobucci/jwt": "*",
         "lexik/jwt-authentication-bundle": "^2.18",
         "symfony/console": "5.4.*",
         "symfony/doctrine-bridge": "5.4.*",

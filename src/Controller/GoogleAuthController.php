@@ -9,14 +9,28 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Signer\Rsa\Sha256;
+
 class GoogleAuthController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private Configuration $jwtConfig;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
+
+        // Configuració del JWT
+        $privateKeyPath = $_ENV['JWT_SECRET_KEY'];
+        $passphrase = $_ENV['JWT_PASSPHRASE'];
+        $this->jwtConfig = Configuration::forAsymmetricSigner(
+            new Sha256(),
+            InMemory::file($privateKeyPath, $passphrase),
+            InMemory::file($_ENV['JWT_PUBLIC_KEY'])
+        );
     }
 
     #[Route('/api/auth/google', methods: ['POST'])]
@@ -30,7 +44,7 @@ class GoogleAuthController extends AbstractController
         }
 
         // Valida el token amb Google
-        $client = new Client();
+        $client = new \GuzzleHttp\Client();
         $response = $client->get('https://oauth2.googleapis.com/tokeninfo', [
             'query' => ['id_token' => $idToken],
         ]);
@@ -52,21 +66,22 @@ class GoogleAuthController extends AbstractController
             $user = new User();
             $user->setEmail($email);
             $user->setUsername($username);
-            // Omple els camps necessaris per complir LGPD
-            // $user->setPassword(null);
 
-            $em = $this->entityManager->getManager();
-            $em->persist($user);
-            $em->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
         }
 
         // Genera un token JWT per l'usuari
-        $jwt = JWT::encode(
-            ['email' => $user->getEmail(), 'exp' => time() + 3600],
-            'your-secret-key',
-            'HS256'
-        );
+        $now = new \DateTimeImmutable();
+        $token = $this->jwtConfig->builder()
+            ->issuedBy('http://your-app.com') // Issuer
+            ->permittedFor('http://your-app.com') // Audience
+            ->identifiedBy('4f1g23a12aa', true) // Token ID
+            ->issuedAt($now)
+            ->expiresAt($now->modify('+1 hour'))
+            ->withClaim('email', $user->getEmail()) // Custom claim
+            ->getToken($this->jwtConfig->signer(), $this->jwtConfig->signingKey());
 
-        return new JsonResponse(['token' => $jwt]);
+        return new JsonResponse(['token' => $token->toString()]);
     }
 }
